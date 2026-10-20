@@ -4,8 +4,6 @@ using UnityEngine.InputSystem;
 
 public class Configuracion : MonoBehaviour
 {
-    public bool accelerometer = true;
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -17,4 +15,6 @@ public class Configuracion : MonoBehaviour
     {
         
     }
+
+    
 }

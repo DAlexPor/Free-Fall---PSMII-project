@@ -6,7 +6,6 @@ public class Jugador : MonoBehaviour
     private Rigidbody2D rb;
     private Collider2D colliderJugador;
     private Camara camara;
-    public Configuracion configuracion;
 
     public float velocidad = 10f;
     private float movimiento;
@@ -14,26 +13,27 @@ public class Jugador : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        configuracion = FindFirstObjectByType<Configuracion>();
         rb = GetComponent<Rigidbody2D>();
         camara = Camera.main.GetComponent<Camara>();
         colliderJugador = GetComponent<Collider2D>();
 
-        rb.gravityScale = 50f;
+        if (Accelerometer.current != null)
+            InputSystem.EnableDevice(Accelerometer.current);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (configuracion.accelerometer)
+        if (Accelerometer.current != null && Accelerometer.current.enabled)
         {
             // Acelerometro input
-            float AcceInput = Accelerometer.current.acceleration.ReadValue().x;
-            movimiento = AcceInput*2;
+            float acceInput = Accelerometer.current.acceleration.ReadValue().x;
+            if (Mathf.Abs(acceInput) < 0.05f) acceInput = 0f;   // zona muerta para evitar temblor
+            movimiento = Mathf.Clamp(acceInput * 2f, -1f, 1f);
         }
         else
         {
-            // Input en x
+            // Normal input (teclado en PC / Editor)
             movimiento = Input.GetAxisRaw("Horizontal");
         }
     }
@@ -54,19 +54,5 @@ public class Jugador : MonoBehaviour
 
         // Aplicar posicion
         rb.MovePosition(posicion);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Obstaculo"))
-        {
-            Debug.Log("Choco");
-        }
-
-        if (collision.gameObject.CompareTag("End"))
-        {
-            Debug.Log("Nivel de prueba COMPLETADO");
-            rb.gravityScale = 0f;
-        }
     }
 }
